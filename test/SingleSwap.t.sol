@@ -4,6 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import "forge-std/Test.sol";
 import "src/Counter.sol";
+
+
+
 contract CounterTest is Test {
     // IUniswapV3Pool public pool;
     SwapRouter public swapRouter;
@@ -13,16 +16,25 @@ contract CounterTest is Test {
     function setUp() public {
         vm.rollFork(16059272);
         // counter = new IUniswapV3Pool();
-        swapRouter = SwapRouter(0xe592427a0aece92de3edee1f18e0157c05861564);
+        swapRouter = SwapRouter(payable(0xE592427A0AEce92De3Edee1F18E0157C05861564));
     }
 
-    function getWeth() public {
-        weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-        swapRouter.getPool(
-        weth,
-        usdc,
-        5
-        );
+    function testGetWeth() public {
+      ISwapRouter.ExactOutputSingleParams memory params =
+            ISwapRouter.ExactOutputSingleParams({
+                tokenIn: usdc,
+                tokenOut: weth,
+                fee: 1,
+                recipient: msg.sender,
+                deadline: block.timestamp,
+                amountOut: 1,
+                amountInMaximum: 1,
+                sqrtPriceLimitX96: 0
+            });
+
+        // Executes the swap returning the amountIn needed to spend to receive the desired amountOut.
+        uint amountIn = swapRouter.exactOutputSingle(params);
+
     }
 
 }
